@@ -7,6 +7,12 @@
                     <div class="mt-5 mb-5 text-center">
                         <h2>Login</h2>
                     </div>
+                    <div class="alert alert-danger alert-dismissible fade show mb-4" role="alert" v-if="error">
+                        <strong>Oops!</strong> {{ error }}
+                        <button type="button" class="close" data-dismiss="alert" aria-label="Close" @click="error = ''">
+                            <span aria-hidden="true">&times;</span>
+                        </button>
+                    </div>
                     <form method="post" class="mt-5" @submit.prevent="onSubmit">
                         <div class="form-group">
                             <input type="email" v-model="email" placeholder="Email" class="form-control">
@@ -29,20 +35,23 @@ export default {
     data(){
         return {
             email: '',
-            password: ''
+            password: '',
+            error: ''
         }
     },
     methods: {
         onSubmit(){
             const data = {
-                client_id: 2,
-                client_secret: 'A5o0iBMZ3Kxjvqh0r6bM5dDeQNc9FtjWuEXCw1um',
-                grant_type: 'password',
                 username: this.email,
                 password: this.password
             }
 
-            this.$store.dispatch('login', data);
+            this.$store.dispatch('login', data).then((res) => {
+                // console.log(res)
+            }).catch((err) => {
+                this.error = err;
+            });
+
             this.email = '';
             this.password = '';
             

@@ -31,23 +31,34 @@ const actions = {
     },
     // authentication
     login({commit, state}, payload){
-        window.axios.post('http://laravelvueauthentication.test/api/login', payload)
-        .then((res) => {
-            commit('SET_TOKEN', res.data)
-            router.push('/home');
-        }).catch((err) => {
-            console.log(err);
+        return new Promise((resolve, reject) => {
+            window.axios.post('http://laravelvueauthentication.test/api/login', payload)
+            .then((res) => {
+                commit('SET_TOKEN', res.data)
+                router.push('/home');
+            }).catch((err) => {
+                reject(err.response.data);
+            });
         });
    },
 
     register({commit, state, dispatch}, payload){
-
-        window.axios.post('http://laravelvueauthentication.test/api/register', payload)
-        .then((res) => {
-            commit('FETCH_AUTH_USER', res.data);
-            dispatch('login', {username: payload.email, password: payload.password});
-        }).catch((err) => {
-            console.log(err);
+        return new Promise((resolve, reject) => {
+            window.axios.post('http://laravelvueauthentication.test/api/register', payload)
+            .then((res) => {
+                commit('FETCH_AUTH_USER', res.data);
+                dispatch('login', {username: payload.email, password: payload.password});
+            }).catch((err) => {
+                let errors = [];
+                Object.keys(err.response.data.errors).forEach(function (item) {
+                    // console.log(item); 
+                    if (item === 'name') errors.push(err.response.data.errors[item][0]);
+                    if (item === 'email') errors.push(err.response.data.errors[item][0]);
+                    if (item === 'password') errors.push(err.response.data.errors[item][0]);
+                });
+        
+                reject(errors);
+            });
         });
     },
     logout({commit, state, getters}, payload){

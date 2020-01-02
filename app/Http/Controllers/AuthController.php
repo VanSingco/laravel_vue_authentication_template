@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
+use App\Http\Requests\UserStoreRequest;
 
 class AuthController extends Controller
 {
@@ -24,7 +25,7 @@ class AuthController extends Controller
             return $response->getBody();
         } catch (\GuzzleHttp\Exception\BadResponseException $e) {
             if ($e->getCode() === 400) {
-                return response()->json('Invalid Request. Please enter a username or a password.', $e->getCode());
+                return response()->json('Your credentials are incorrect. Please try again', $e->getCode());
             } else if ($e->getCode() === 401) {
                 return response()->json('Your credentials are incorrect. Please try again', $e->getCode());
             }
@@ -33,13 +34,16 @@ class AuthController extends Controller
 
     }
 
-    public function register(Request $request)
+    public function register(UserStoreRequest $request)
     {
-        $request->validate([
-            'name' => 'required|string|max:255',
-            'email' => 'required|string|email|max:255|unique:users',
-            'password' => 'required|string|min:6',
-        ]);
+        $validated = $request->validated();
+
+        if ($validated->fails()) {
+    
+            //pass validator errors as errors object for ajax response
+        
+            return response()->json(['errors'=>$validated->messages()]);
+        }
         
         $user = User::create([
             'name' => $request->name,

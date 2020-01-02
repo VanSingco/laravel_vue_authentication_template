@@ -1897,24 +1897,33 @@ __webpack_require__.r(__webpack_exports__);
 //
 //
 //
+//
+//
+//
+//
+//
+//
 
 /* harmony default export */ __webpack_exports__["default"] = ({
   data: function data() {
     return {
       email: '',
-      password: ''
+      password: '',
+      error: ''
     };
   },
   methods: {
     onSubmit: function onSubmit() {
+      var _this = this;
+
       var data = {
-        client_id: 2,
-        client_secret: 'A5o0iBMZ3Kxjvqh0r6bM5dDeQNc9FtjWuEXCw1um',
-        grant_type: 'password',
         username: this.email,
         password: this.password
       };
-      this.$store.dispatch('login', data);
+      this.$store.dispatch('login', data).then(function (res) {// console.log(res)
+      })["catch"](function (err) {
+        _this.error = err;
+      });
       this.email = '';
       this.password = '';
     }
@@ -1964,21 +1973,34 @@ __webpack_require__.r(__webpack_exports__);
 //
 //
 //
+//
+//
+//
+//
+//
+//
+//
+//
 
 /* harmony default export */ __webpack_exports__["default"] = ({
   data: function data() {
     return {
       name: '',
       email: '',
-      password: ''
+      password: '',
+      errors: []
     };
   },
   methods: {
     onSubmit: function onSubmit() {
+      var _this = this;
+
       this.$store.dispatch('register', {
         name: this.name,
         email: this.email,
         password: this.password
+      }).then(function (res) {})["catch"](function (err) {
+        _this.errors = err;
       });
       this.name = '';
       this.email = '';
@@ -37591,6 +37613,44 @@ var render = function() {
             _c("div", { staticClass: "col-md-5" }, [
               _vm._m(0),
               _vm._v(" "),
+              _vm.error
+                ? _c(
+                    "div",
+                    {
+                      staticClass:
+                        "alert alert-danger alert-dismissible fade show mb-4",
+                      attrs: { role: "alert" }
+                    },
+                    [
+                      _c("strong", [_vm._v("Oops!")]),
+                      _vm._v(
+                        " " + _vm._s(_vm.error) + "\n                    "
+                      ),
+                      _c(
+                        "button",
+                        {
+                          staticClass: "close",
+                          attrs: {
+                            type: "button",
+                            "data-dismiss": "alert",
+                            "aria-label": "Close"
+                          },
+                          on: {
+                            click: function($event) {
+                              _vm.error = ""
+                            }
+                          }
+                        },
+                        [
+                          _c("span", { attrs: { "aria-hidden": "true" } }, [
+                            _vm._v("×")
+                          ])
+                        ]
+                      )
+                    ]
+                  )
+                : _vm._e(),
+              _vm._v(" "),
               _c(
                 "form",
                 {
@@ -37719,6 +37779,32 @@ var render = function() {
             _c("div", { staticClass: "col-md-5" }, [
               _vm._m(0),
               _vm._v(" "),
+              _vm.errors.length > 0
+                ? _c(
+                    "div",
+                    { staticClass: "mb-4" },
+                    _vm._l(_vm.errors, function(error, i) {
+                      return _c(
+                        "div",
+                        {
+                          key: i,
+                          staticClass:
+                            "alert alert-danger alert-dismissible fade show",
+                          attrs: { role: "alert" }
+                        },
+                        [
+                          _c("strong", [_vm._v("Oops!")]),
+                          _vm._v(
+                            " " + _vm._s(error) + "\n                        "
+                          ),
+                          _vm._m(1, true)
+                        ]
+                      )
+                    }),
+                    0
+                  )
+                : _vm._e(),
+              _vm._v(" "),
               _c(
                 "form",
                 {
@@ -37804,7 +37890,7 @@ var render = function() {
                     })
                   ]),
                   _vm._v(" "),
-                  _vm._m(1)
+                  _vm._m(2)
                 ]
               )
             ])
@@ -37823,6 +37909,23 @@ var staticRenderFns = [
     return _c("div", { staticClass: "mt-5 mb-5 text-center" }, [
       _c("h2", [_vm._v("Register")])
     ])
+  },
+  function() {
+    var _vm = this
+    var _h = _vm.$createElement
+    var _c = _vm._self._c || _h
+    return _c(
+      "button",
+      {
+        staticClass: "close",
+        attrs: {
+          type: "button",
+          "data-dismiss": "alert",
+          "aria-label": "Close"
+        }
+      },
+      [_c("span", { attrs: { "aria-hidden": "true" } }, [_vm._v("×")])]
+    )
   },
   function() {
     var _vm = this
@@ -54900,25 +55003,36 @@ var actions = {
   login: function login(_ref2, payload) {
     var commit = _ref2.commit,
         state = _ref2.state;
-    window.axios.post('http://laravelvueauthentication.test/api/login', payload).then(function (res) {
-      commit('SET_TOKEN', res.data);
-      _router_index__WEBPACK_IMPORTED_MODULE_0__["default"].push('/home');
-    })["catch"](function (err) {
-      console.log(err);
+    return new Promise(function (resolve, reject) {
+      window.axios.post('http://laravelvueauthentication.test/api/login', payload).then(function (res) {
+        commit('SET_TOKEN', res.data);
+        _router_index__WEBPACK_IMPORTED_MODULE_0__["default"].push('/home');
+      })["catch"](function (err) {
+        reject(err.response.data);
+      });
     });
   },
   register: function register(_ref3, payload) {
     var commit = _ref3.commit,
         state = _ref3.state,
         dispatch = _ref3.dispatch;
-    window.axios.post('http://laravelvueauthentication.test/api/register', payload).then(function (res) {
-      commit('FETCH_AUTH_USER', res.data);
-      dispatch('login', {
-        username: payload.email,
-        password: payload.password
+    return new Promise(function (resolve, reject) {
+      window.axios.post('http://laravelvueauthentication.test/api/register', payload).then(function (res) {
+        commit('FETCH_AUTH_USER', res.data);
+        dispatch('login', {
+          username: payload.email,
+          password: payload.password
+        });
+      })["catch"](function (err) {
+        var errors = [];
+        Object.keys(err.response.data.errors).forEach(function (item) {
+          // console.log(item); 
+          if (item === 'name') errors.push(err.response.data.errors[item][0]);
+          if (item === 'email') errors.push(err.response.data.errors[item][0]);
+          if (item === 'password') errors.push(err.response.data.errors[item][0]);
+        });
+        reject(errors);
       });
-    })["catch"](function (err) {
-      console.log(err);
     });
   },
   logout: function logout(_ref4, payload) {
