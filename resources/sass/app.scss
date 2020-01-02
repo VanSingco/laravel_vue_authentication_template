@@ -1,0 +1,13 @@
+// Fonts
+// @import url('https://fonts.googleapis.com/css?family=Nunito');
+@import url('https://fonts.googleapis.com/css?family=Barlow:200,300,500,600,800|Roboto:400,500');
+// Variables
+@import 'variables';
+
+// Bootstrap
+@import '~bootstrap/scss/bootstrap';
+
+body {
+    background-color: #f4f4f5 !important;  
+    font-family: 'Barlow', sans-serif !important;
+}
